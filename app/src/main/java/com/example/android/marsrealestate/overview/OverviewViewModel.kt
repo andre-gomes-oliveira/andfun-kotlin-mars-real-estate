@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.android.marsrealestate.network.MarsApi
+import com.example.android.marsrealestate.network.MarsProperty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,15 +32,19 @@ import kotlinx.coroutines.launch
  */
 class OverviewViewModel : ViewModel() {
 
-    // TODO (02) Rename response LiveData to status
+    // DONE (02) Rename response LiveData to status
     // The internal MutableLiveData String that stores the most recent response
-    private val _response = MutableLiveData<String>()
+    private val status = MutableLiveData<String>()
 
     // The external immutable LiveData for the response String
     val response: LiveData<String>
-        get() = _response
+        get() = status
 
-    // TODO (03) Add the LiveData MarsProperty property with an internal Mutable and an external LiveData
+    // DONE (03) Add the LiveData MarsProperty property with an internal Mutable and an external LiveData
+    private val _property = MutableLiveData<MarsProperty>()
+
+    val property: LiveData<MarsProperty>
+        get() = _property
 
     // Create a Coroutine scope using a job to be able to cancel when needed
     private var viewModelJob = Job()
@@ -65,10 +70,11 @@ class OverviewViewModel : ViewModel() {
             try {
                 // Await the completion of our Retrofit request
                 var listResult = getPropertiesDeferred.await()
-                // TODO (04) Update to set _property to the first MarsProperty from listResult
-                _response.value = "Success: ${listResult.size} Mars properties retrieved"
+                // DONE (04) Update to set _property to the first MarsProperty from listResult
+                status.value = "Success: ${listResult.size} Mars properties retrieved"
+                _property.value = listResult[0]
             } catch (e: Exception) {
-                _response.value = "Failure: ${e.message}"
+                status.value = "Failure: ${e.message}"
             }
         }
     }
